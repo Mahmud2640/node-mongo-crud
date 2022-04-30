@@ -1,5 +1,6 @@
 const express = require("express");
 const { MongoClient, ServerApiVersion } = require("mongodb");
+const ObjectId = require("mongodb").ObjectID;
 const cors = require("cors");
 const app = express();
 const port = process.env.PORT || 5000;
@@ -22,17 +23,35 @@ const client = new MongoClient(uri, {
 });
 
 async function run() {
-   try {
-      await client.connect();
-      const userCollection = client.db("myFirstDatabase").collection("users"); 
-      const user = {name: "Mahmud", email: "mdmahmud484@gmail.com"};
-      const result = await userCollection.insertOne(user);
-      console.log(`Inserted user with the following id: ${result.insertedId}`);
-   } 
-    finally {
-      // await client.close();
-   }
+  try {
+    await client.connect();
+    const userCollection = client.db("myFirstDatabase").collection("users");
 
+    // Get all users
+    app.get("/user", async (req, res) => {
+      const query = {};
+      const cursor = userCollection.find(query);
+      const users = await cursor.toArray();
+      res.send(users);
+    });
+
+    //get post
+    app.post("/user", async (req, res) => {
+      const newUser = req.body;
+      console.log("adding newUser", newUser);
+      const result = await userCollection.insertOne(newUser);
+      res.send(result);
+    });
+
+    //  delete users
+    app.delete("/user/:id", async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: ObjectId(id) };
+      const result = await userCollection.deleteOne(query);
+      res.send(result);
+    });
+  } finally {
+  }
 }
 
 run().catch(console.dir);
