@@ -1,11 +1,48 @@
-const express = require('express');
+const express = require("express");
+const { MongoClient, ServerApiVersion } = require("mongodb");
+const cors = require("cors");
 const app = express();
 const port = process.env.PORT || 5000;
 
-app.get('/', (req, res) =>{
-   res.send('Running my First Node Crud Server')
-})
+// Middleware
+app.use(cors());
+app.use(express.json());
 
+// User name = mahmud2640
+// Password = OtN9vlqcEs1swcgU
+
+// Database
+
+const uri =
+  "mongodb+srv://mahmud2640:OtN9vlqcEs1swcgU@project-01.zfxst.mongodb.net/myFirstDatabase?retryWrites=true&w=majority";
+const client = new MongoClient(uri, {
+  useNewUrlParser: true,
+  useUnifiedTopology: true,
+  serverApi: ServerApiVersion.v1,
+});
+
+async function run() {
+   try {
+      await client.connect();
+      const userCollection = client.db("myFirstDatabase").collection("users"); 
+      const user = {name: "Mahmud", email: "mdmahmud484@gmail.com"};
+      const result = await userCollection.insertOne(user);
+      console.log(`Inserted user with the following id: ${result.insertedId}`);
+   } 
+    finally {
+      // await client.close();
+   }
+
+}
+
+run().catch(console.dir);
+
+// Routes
+app.get("/", (req, res) => {
+  res.send("Running my First Node Crud Server");
+});
+
+// Start Server
 app.listen(port, () => {
-   console.log('CRUD server is running...')
-})
+  console.log("CRUD server is running...");
+});
