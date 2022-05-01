@@ -35,6 +35,14 @@ async function run() {
       res.send(users);
     });
 
+    // Get user by id
+    app.get("/user/:id", async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: ObjectId(id) };
+      const result = await userCollection.findOne(query);
+      res.send(result);
+    });
+
     //get post
     app.post("/user", async (req, res) => {
       const newUser = req.body;
